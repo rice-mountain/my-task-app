@@ -19,7 +19,10 @@ npm install @mantine/core @mantine/hooks @emotion/react
 npm instal uuid
 npm install react-router-dom
 npm install date-fns
+npm install framer-motion
 
+# 永続化
+npm install firebase
 # 開発サーバー起動
 
 npm run dev
