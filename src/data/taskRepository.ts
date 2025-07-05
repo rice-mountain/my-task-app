@@ -11,19 +11,26 @@ import type { Task } from "../types/task";
 
 const tasksCol = collection(db, "tasks");
 
+// タスク一覧を取得
 export const fetchTasks = async (): Promise<Task[]> => {
   const snapshot = await getDocs(tasksCol);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Task));
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    ...(d.data() as Omit<Task, "id">),
+  }));
 };
 
+// タスクを追加
 export const addTask = async (task: Omit<Task, "id">) => {
   await addDoc(tasksCol, task);
 };
 
-export const updateTask = async (id: string, task: Partial<Task>) => {
-  await updateDoc(doc(tasksCol, id), task);
+// タスクを更新
+export const updateTask = async (id: string, task: Partial<Omit<Task, "id">>) => {
+  await updateDoc(doc(db, "tasks", id), task);
 };
 
+// タスクを削除
 export const deleteTask = async (id: string) => {
-  await deleteDoc(doc(tasksCol, id));
+  await deleteDoc(doc(db, "tasks", id));
 };

@@ -1,64 +1,80 @@
-import { useState } from "react";
-import { Button, TextInput, Textarea, Select, Stack } from "@mantine/core";
+import React, { useState } from "react";
 import type { Task } from "../types/task";
+import { TextInput, Textarea, Select, Button, Group } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
 
-type Props = {
-  onSubmit: (task: Omit<Task, "id">) => void;
-  initial?: Omit<Task, "id">;
-  isEdit?: boolean;
+type TaskFormProps = {
+  onSubmit: (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
+  initialTask?: Partial<Task>;
 };
 
-const TaskForm = ({ onSubmit, initial, isEdit = false }: Props) => {
-  const [title, setTitle] = useState(initial?.title || "");
-  const [description, setDescription] = useState(initial?.description || "");
-  const [status, setStatus] = useState<Task["status"]>(
-    initial?.status || "todo"
+const TaskForm: React.FC<TaskFormProps> = ({ onSubmit, initialTask = {} }) => {
+  const [title, setTitle] = useState(initialTask.title || "");
+  const [description, setDescription] = useState(initialTask.description || "");
+  const [dueDate, setDueDate] = useState<string | null>(
+    initialTask.dueDate
+      ? typeof initialTask.dueDate === "string"
+        ? initialTask.dueDate
+        : initialTask.dueDate.toISOString().slice(0, 10)
+      : null
   );
+  const [priority, setPriority] = useState<"low" | "medium" | "high">(initialTask.priority || "medium");
+  const [category, setCategory] = useState(initialTask.category || "");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       title,
       description,
-      status,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      status: initialTask.status || "todo",
+      dueDate: dueDate ? new Date(dueDate) : undefined,
+      priority,
+      category,
     });
-    setTitle("");
-    setDescription("");
-    setStatus("todo");
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack gap="md">
-        <TextInput
-          label="タイトル"
-          placeholder="タスク名を入力"
-          value={title}
-          onChange={(e) => setTitle(e.currentTarget.value)}
-          required
-        />
-        <Textarea
-          label="詳細"
-          placeholder="詳細を入力"
-          value={description}
-          onChange={(e) => setDescription(e.currentTarget.value)}
-        />
-        <Select
-          label="ステータス"
-          value={status}
-          onChange={(value) => setStatus(value as Task["status"])}
-          data={[
-            { value: "todo", label: "To Do" },
-            { value: "in-progress", label: "In Progress" },
-            { value: "done", label: "Done" },
-          ]}
-        />
-        <Button type="submit" color="blue">
-          {isEdit ? "更新" : "追加"}
-        </Button>
-      </Stack>
+      <TextInput
+        label="タイトル"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+        mb="sm"
+      />
+      <Textarea
+        label="説明"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        mb="sm"
+      />
+      <DateInput
+        label="期限日"
+        value={dueDate}
+        onChange={setDueDate}
+        mb="sm"
+        clearable
+      />
+      <Select
+        label="優先度"
+        value={priority}
+        onChange={(v) => setPriority((v as "low" | "medium" | "high") || "medium")}
+        data={[
+          { value: "low", label: "低" },
+          { value: "medium", label: "中" },
+          { value: "high", label: "高" },
+        ]}
+        mb="sm"
+      />
+      <TextInput
+        label="カテゴリー"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        mb="sm"
+      />
+      <Group  mt="md">
+        <Button type="submit">保存</Button>
+      </Group>
     </form>
   );
 };

@@ -65,6 +65,7 @@ const TaskTable = ({ tasks, onEdit, onDelete }: Props) => {
     <Table highlightOnHover withTableBorder style={{ minWidth: 900 }}>
       <Table.Thead>
         <Table.Tr>
+          <Table.Th></Table.Th>
           <Table.Th>タイトル</Table.Th>
           <Table.Th>詳細</Table.Th>
           <Table.Th>ステータス</Table.Th>

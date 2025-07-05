@@ -2,7 +2,7 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { AnimatePresence, motion } from "framer-motion";
-import { Box, Container } from "@mantine/core";
+import { Box } from "@mantine/core";
 import type { Task } from "./types/task";
 import TaskList from "./features/tasks/TaskList";
 import TaskForm from "./components/TaskForm";
