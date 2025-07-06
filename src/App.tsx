@@ -1,45 +1,16 @@
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Box } from "@mantine/core";
-import type { Task } from "./types/task";
-import TaskList from "./features/tasks/TaskList";
-import TaskForm from "./components/TaskForm";
-import EditTaskPage from "./components/EditTaskPage";
-import TaskDetail from "./components/TaskDetail";
-import { defaultTasks } from "./data/defaultTasks";
 import AppNav from "./components/AppNav";
 import SideNav from "./components/SideNav";
-
+import { useTasks } from "./hooks/useTasks";
+import AppRoutes from "./routes/AppRoutes";
+import FirestoreTestButton from "./components/FirestoreTestButton";
 const App = () => {
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const addTask = (task: Omit<Task, "id">) => {
-    const now = new Date().toISOString();
-    setTasks((prev) => [
-      ...prev,
-      { ...task, id: uuidv4(), createdAt: now, updatedAt: now },
-    ]);
-    navigate("/");
-  };
+  const { tasks, addTask, updateTask, deleteTask } = useTasks();
 
-  const updateTask = (
-    id: string,
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">
-  ) => {
-    const now = new Date().toISOString();
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...task, updatedAt: now } : t))
-    );
-    navigate("/");
-  };
-
-  const deleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-  };
 
   return (
     <Box style={{ minHeight: "100vh", background: "#fff" }}>
@@ -67,32 +38,21 @@ const App = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <Routes location={location} key={location.pathname}>
-                    <Route
-                      path="/"
-                      element={
-                        <TaskList
-                          tasks={tasks}
-                          onDelete={deleteTask}
-                          onEdit={(task) => navigate(`/edit/${task.id}`)}
-                          onAdd={() => navigate("/add")}
-                        />
-                      }
-                    />
-                    <Route path="/add" element={<TaskForm onSubmit={addTask} />} />
-                    <Route
-                      path="/edit/:id"
-                      element={<EditTaskPage tasks={tasks} onUpdate={updateTask} />}
-                    />
-                    <Route path="/detail/:id" element={<TaskDetail tasks={tasks} />} />
-                  </Routes>
+                  <AppRoutes
+                    tasks={tasks}
+                    onAdd={addTask}
+                    onUpdate={updateTask}
+                    onDelete={deleteTask}
+                  />
                 </motion.div>
               </AnimatePresence>
             </Box>
           </Box>
         </Box>
       </Box>
+      <FirestoreTestButton />
     </Box>
+    
   );
 };
 

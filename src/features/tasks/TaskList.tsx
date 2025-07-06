@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import type { Task } from "../../types/task";
 import TaskItem from "./TaskItem";
 import TaskTable from "./TaskTable";
-import TaskSearchForm from "../../components/TaskSearchForm";
+import TaskSearchForm from "./TaskSearchForm";
 import {
   Button,
   Group,

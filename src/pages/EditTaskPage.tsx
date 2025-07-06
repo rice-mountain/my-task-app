@@ -4,7 +4,7 @@ import TaskForm from "./TaskForm";
 
 type Props = {
   tasks: Task[];
-  onUpdate: (id: string, task: Omit<Task, "id">) => void;
+  onUpdate: (id: string, task: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
 };
 
 const EditTaskPage = ({ tasks, onUpdate }: Props) => {

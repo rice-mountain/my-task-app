@@ -34,3 +34,18 @@ export const updateTask = async (id: string, task: Partial<Omit<Task, "id">>) =>
 export const deleteTask = async (id: string) => {
   await deleteDoc(doc(db, "tasks", id));
 };
+
+// ✅ Firestoreにテストデータを追加する関数
+export  const addTestTaskToFirestore = async () => {
+    try {
+      await addDoc(collection(db, "tasks"), {
+        title: "テストタスク",
+        completed: false,
+        createdAt: new Date(),
+      });
+      alert("✅ Firestore に追加されました！");
+    } catch (e) {
+      console.error("❌ Firestore追加失敗:", e);
+      alert("❌ Firestoreへの追加に失敗しました");
+    }
+  };
