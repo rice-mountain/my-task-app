@@ -1,34 +1,46 @@
 // hooks/useTasks.ts
-import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useState, useEffect, useCallback } from "react";
 import type { Task } from "../types/task";
-import { defaultTasks } from "../data/defaultTasks";
+import {
+  fetchTasks as fetchTasksRepo,
+  addTask as addTaskRepo,
+  updateTask as updateTaskRepo,
+  deleteTask as deleteTaskRepo,
+} from "../data/taskRepository";
 
 export const useTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const addTask = (task: Omit<Task, "id" | "createdAt" | "updatedAt">) => {
-    const now = new Date().toISOString();
-    setTasks((prev) => [
-      ...prev,
-      { ...task, id: uuidv4(), createdAt: now, updatedAt: now },
-    ]);
-  };
+  const loadTasks = useCallback(async () => {
+    const data = await fetchTasksRepo();
+    setTasks(data);
+  }, []);
 
-  const updateTask = (
-    id: string,
-    task: Omit<Task, "id" | "createdAt" | "updatedAt">
+  useEffect(() => {
+    loadTasks();
+  }, [loadTasks]);
+
+  const addTask = async (
+    task: Omit<Task, "id" | "createdAt" | "updatedAt">,
   ) => {
     const now = new Date().toISOString();
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...task, updatedAt: now } : t))
-    );
+    await addTaskRepo({ ...task, createdAt: now, updatedAt: now });
+    await loadTasks();
   };
 
-  const deleteTask = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+  const updateTask = async (
+    id: string,
+    task: Omit<Task, "id" | "createdAt" | "updatedAt">,
+  ) => {
+    const now = new Date().toISOString();
+    await updateTaskRepo(id, { ...task, updatedAt: now });
+    await loadTasks();
   };
 
-  
-  return { tasks, addTask, updateTask, deleteTask};
+  const deleteTask = async (id: string) => {
+    await deleteTaskRepo(id);
+    await loadTasks();
+  };
+
+  return { tasks, addTask, updateTask, deleteTask };
 };
